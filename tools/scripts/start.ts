@@ -8,11 +8,13 @@ import express from 'express';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
+import httpProxyMiddleware from 'http-proxy-middleware';
 import { ParsedArgs } from 'minimist';
 import Defer from '../internals/defer';
 import { injectEntries, injectPlugins } from '../internals/webpackHelper';
 import { PUBLIC_DIR } from '../paths.config';
 import webpackConfig from '../webpack.config';
+import proxyConfig from '../proxy.config';
 
 /**
  * Launches a development web server
@@ -50,6 +52,14 @@ function start(args: ParsedArgs) {
   // Serves static files
   // https://expressjs.com/en/api.html#express.static
   server.use(express.static(PUBLIC_DIR));
+
+  // Apply proxy configurations
+  // https://github.com/chimurai/http-proxy-middleware#proxycontext-config
+  if (Array.isArray(proxyConfig) && proxyConfig.length) {
+    proxyConfig.forEach(({ context, ...config }) => {
+      server.use(httpProxyMiddleware(context, config));
+    });
+  }
 
   // Start listening to the server port
   // http://expressjs.com/en/api.html#app.listen
