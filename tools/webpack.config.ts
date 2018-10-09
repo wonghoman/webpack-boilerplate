@@ -5,6 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import webpack from 'webpack';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
+import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import { getClientEnvironment } from './internals/env';
 import * as paths from './paths.config';
 
@@ -56,6 +59,124 @@ const webpackConfig: webpack.Configuration = {
           },
         ],
       },
+
+      {
+        test: /\.(css|less|scss|sass)$/,
+        rules: [
+          {
+            loader: isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+          },
+
+          // Process external/third-party styles
+          {
+            exclude: paths.SRC_DIR,
+            loader: 'css-loader',
+            options: {
+              sourceMap: isDev,
+            },
+          },
+
+          // Process internal/project styles (from src folder)
+          {
+            include: paths.SRC_DIR,
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+              sourceMap: isDev,
+              // CSS Modules https://github.com/css-modules/css-modules
+              modules: true,
+              localIdentName: isDev ? '[name]_[local]--[hash:base64:5]' : '[hash:base64:5]',
+            },
+          },
+
+          // Apply PostCSS plugins including autoprefixer
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: [
+                // Add vendor prefixes to CSS rules using values from caniuse.com
+                // https://github.com/postcss/autoprefixer
+                require('autoprefixer')({
+                  // flexbox: 'no-2009', // Recommended for modern browsers
+                }),
+              ],
+            },
+          },
+
+          // Compile Less to CSS
+          // https://github.com/webpack-contrib/less-loader
+          // Install dependencies before uncommenting: yarn add --dev less-loader less
+          // {
+          //   test: /\.less$/,
+          //   loader: 'less-loader',
+          //   options: {
+          //     sourceMap: isDev,
+          //   },
+          // },
+
+          // Compile Sass to CSS
+          // https://github.com/webpack-contrib/sass-loader
+          // Install dependencies before uncommenting: yarn add --dev sass-loader node-sass
+          // {
+          //   test: /\.(scss|sass)$/,
+          //   loader: 'sass-loader',
+          //   options: {
+          //     sourceMap: isDev,
+          //     includePaths: [paths.SRC_DIR],
+          //   },
+          // },
+        ],
+      },
+
+      {
+        test: /\.(bmp|gif|jpg|jpeg|png|svg)$/,
+        oneOf: [
+          {
+            issuer: /\.(css|less|scss|sass)$/,
+            oneOf: [
+              {
+                test: /\.svg$/,
+                loader: 'svg-url-loader',
+                options: {
+                  name: 'assets/[hash:8].[ext]',
+                  limit: 8192, // 8kb
+                },
+              },
+
+              {
+                loader: 'url-loader',
+                options: {
+                  name: 'assets/[hash:8].[ext]',
+                  limit: 8192, // 8kb
+                },
+              },
+            ],
+          },
+
+          {
+            loader: 'file-loader',
+            options: {
+              name: 'assets/[hash:8].[ext]',
+            },
+          },
+        ],
+      },
+
+      {
+        test: /\.(eot|ttf|woff|woff2)$/,
+        loader: 'file-loader',
+        options: {
+          name: 'fonts/[hash].[ext]',
+        },
+      },
+
+      {
+        test: /\.(avi|mp3|mp4|mpg|ogg|wav|wmv)$/,
+        loader: 'file-loader',
+        options: {
+          name: 'media/[hash].[ext]',
+        },
+      },
     ],
   },
 
@@ -66,7 +187,36 @@ const webpackConfig: webpack.Configuration = {
       'process.env': clientEnv.stringified,
       __DEV__: isDev,
     }),
+
+    // Extracts CSS into separate files
+    // https://webpack.js.org/plugins/mini-css-extract-plugin/
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash:8].css',
+      chunkFilename: 'chunks/[name].[contenthash:8].css',
+    }),
   ],
+
+  optimization: {
+    minimizer: [
+      // Minimize all JavaScript output of chunks
+      // https://github.com/mishoo/UglifyJS2#compressor-options
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: true,
+        uglifyOptions: {
+          warnings: isVerbose,
+          output: {
+            comments: false,
+          },
+        },
+      }),
+
+      // Optimize and minimize CSS assets
+      // https://github.com/NMFR/optimize-css-assets-webpack-plugin
+      new OptimizeCSSAssetsPlugin(),
+    ],
+  },
 
   // Don't attempt to continue if there are any errors.
   bail: !isDev,
