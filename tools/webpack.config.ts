@@ -5,10 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 import webpack from 'webpack';
+import { getClientEnvironment } from './internals/env';
 import * as paths from './paths.config';
 
 const isDev = process.env.NODE_ENV === 'development';
 const isVerbose = process.argv.includes('--verbose');
+const clientEnv = getClientEnvironment();
 
 const webpackConfig: webpack.Configuration = {
   mode: isDev ? 'development' : 'production',
@@ -61,6 +63,7 @@ const webpackConfig: webpack.Configuration = {
     // Define free variables
     // https://webpack.js.org/plugins/define-plugin/
     new webpack.DefinePlugin({
+      'process.env': clientEnv.stringified,
       __DEV__: isDev,
     }),
   ],

@@ -20,3 +20,8 @@ export const SRC_DIR = path.resolve(ROOT_DIR, 'src');
  * Build output directory
  */
 export const BUILD_DIR = path.resolve(ROOT_DIR, 'build');
+
+/**
+ * Public assets directory
+ */
+export const PUBLIC_DIR = path.resolve(ROOT_DIR, 'public');
