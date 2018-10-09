@@ -5,10 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 import webpack from 'webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import { getClientEnvironment } from './internals/env';
+import lookupEntries from './internals/lookupEntries';
 import * as paths from './paths.config';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -19,6 +21,9 @@ const webpackConfig: webpack.Configuration = {
   mode: isDev ? 'development' : 'production',
 
   context: paths.SRC_DIR,
+
+  // Don't set any entry, it will reslove from the 'entries' directory
+  entry: {},
 
   output: {
     path: paths.BUILD_DIR,
@@ -246,5 +251,27 @@ const webpackConfig: webpack.Configuration = {
     version: isVerbose,
   },
 };
+
+const entries = lookupEntries();
+const webpackEntry = (webpackConfig.entry = {} as webpack.Entry);
+const webpackPlugins = webpackConfig.plugins!;
+Object.keys(entries).forEach(name => {
+  const entry = entries[name];
+
+  webpackEntry[name] = [entry.script];
+  webpackPlugins.push(
+    // Simplifies creation of HTML files to serve your webpack bundles
+    // https://github.com/jantimon/html-webpack-plugin
+    new HtmlWebpackPlugin({
+      filename: `${name}.html`,
+      chunks: [name],
+      hash: isDev,
+      minify: {
+        collapseWhitespace: !isDev,
+      },
+      ...(entry.template ? { template: entry.template } : {}),
+    }),
+  );
+});
 
 export default webpackConfig;

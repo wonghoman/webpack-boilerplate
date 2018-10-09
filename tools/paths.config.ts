@@ -25,3 +25,8 @@ export const BUILD_DIR = path.resolve(ROOT_DIR, 'build');
  * Public assets directory
  */
 export const PUBLIC_DIR = path.resolve(ROOT_DIR, 'public');
+
+/**
+ * Entry directory
+ */
+export const ENTRY_DIR = path.resolve(SRC_DIR, 'entries');
