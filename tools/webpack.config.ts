@@ -54,10 +54,36 @@ const webpackConfig: webpack.Configuration = {
 
         rules: [
           {
+            loader: 'babel-loader',
+            options: {
+              babelrc: false,
+              cacheDirectory: isDev,
+              presets: [
+                [
+                  '@babel/preset-env',
+                  {
+                    forceAllTransforms: !isDev, // for UglifyJS
+                    modules: false, // for Tree-shaking
+                    useBuiltIns: false,
+                    loose: true,
+                  },
+                ],
+                [
+                  '@babel/preset-react',
+                  {
+                    development: isDev,
+                  },
+                ],
+              ],
+              plugins: ['@babel/plugin-syntax-dynamic-import'],
+            },
+          },
+
+          {
             loader: 'ts-loader',
             options: {
               compilerOptions: {
-                module: 'es2015', // for Tree-shaking
+                module: 'esNext', // for Tree-shaking
                 sourceMap: isDev,
               },
             },
