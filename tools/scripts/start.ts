@@ -14,6 +14,7 @@ import Defer from '../internals/defer';
 import { injectEntries, injectPlugins } from '../internals/webpackHelper';
 import { PUBLIC_DIR } from '../paths.config';
 import webpackConfig from '../webpack.config';
+import babelConfig from '../babel.config';
 import proxyConfig from '../proxy.config';
 
 /**
@@ -28,6 +29,10 @@ function start(args: ParsedArgs) {
     // Inject webpack hot loading configuration
     injectEntries(webpackConfig, ['webpack-hot-middleware/client']);
     injectPlugins(webpackConfig, [new webpack.HotModuleReplacementPlugin()]);
+
+    // Integrated react-hot-loader plugin
+    babelConfig.plugins = babelConfig.plugins || [];
+    babelConfig.plugins.push('react-hot-loader/babel');
   }
 
   const server = express();

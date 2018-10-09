@@ -12,6 +12,7 @@ import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import { getClientEnvironment } from './internals/env';
 import lookupEntries from './internals/lookupEntries';
 import * as paths from './paths.config';
+import babelConfig from './babel.config';
 
 const isDev = process.env.NODE_ENV === 'development';
 const isVerbose = process.argv.includes('--verbose');
@@ -55,28 +56,7 @@ const webpackConfig: webpack.Configuration = {
         rules: [
           {
             loader: 'babel-loader',
-            options: {
-              babelrc: false,
-              cacheDirectory: isDev,
-              presets: [
-                [
-                  '@babel/preset-env',
-                  {
-                    forceAllTransforms: !isDev, // for UglifyJS
-                    modules: false, // for Tree-shaking
-                    useBuiltIns: false,
-                    loose: true,
-                  },
-                ],
-                [
-                  '@babel/preset-react',
-                  {
-                    development: isDev,
-                  },
-                ],
-              ],
-              plugins: ['@babel/plugin-syntax-dynamic-import'],
-            },
+            options: babelConfig,
           },
 
           {

@@ -8,7 +8,10 @@
     "Firefox ESR",
     "not dead"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
+  },
   "devDependencies": {
     "@babel/core": "^7.1.2",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
@@ -23,6 +26,9 @@
     "@types/mini-css-extract-plugin": "^0.2.0",
     "@types/minimist": "^1.2.0",
     "@types/optimize-css-assets-webpack-plugin": "^1.3.3",
+    "@types/react": "^16.4.16",
+    "@types/react-dom": "^16.0.9",
+    "@types/react-hot-loader": "^4.1.0",
     "@types/uglifyjs-webpack-plugin": "^1.1.0",
     "@types/webpack": "^4.4.15",
     "@types/webpack-dev-middleware": "^2.0.2",
@@ -46,6 +52,7 @@
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "postcss-loader": "^3.0.0",
     "prettier": "^1.14.3",
+    "react-hot-loader": "^4.3.11",
     "style-loader": "^0.23.1",
     "stylelint": "^9.6.0",
     "stylelint-config-standard": "^18.2.0",
@@ -85,7 +92,7 @@
         "prettier --write",
         "git add"
       ],
-      "*.{ejs,html,json,md}": [
+      "*.{json,md}": [
         "prettier --write",
         "git add"
       ]
