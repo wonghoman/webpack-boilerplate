@@ -39,5 +39,16 @@ export default {
       },
     ],
   ],
-  plugins: ['@babel/plugin-syntax-dynamic-import'],
+  plugins: [
+    [
+      '@babel/plugin-transform-runtime',
+      {
+        corejs: false,
+        helpers: true,
+        regenerator: false,
+        useESModules: true,
+      },
+    ],
+    '@babel/plugin-syntax-dynamic-import',
+  ],
 } as BabelConfig;
