@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 class Defer<T = void> {
-  public readonly promise: PromiseLike<T>;
-  public resolve!: (value?: T | PromiseLike<T>) => void;
+  public readonly promise: Promise<T>;
+  public resolve!: (value?: T | Promise<T>) => void;
   public reject!: (reason?: any) => void;
 
   /**

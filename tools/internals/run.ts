@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-type TaskFn<T> = (options?: any) => PromiseLike<T> | T;
+type TaskFn<T> = (options?: any) => Promise<T> | T;
 interface TaskScript<T> {
   default: TaskFn<T>;
 }
