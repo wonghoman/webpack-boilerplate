@@ -48,6 +48,9 @@ const webpackConfig: webpack.Configuration = {
     strictExportPresence: true,
 
     rules: [
+      // Disable require.ensure as it's not a standard language feature.
+      { parser: { requireEnsure: false } },
+
       // Rules for TS / TSX
       {
         test: /\.(ts|tsx)$/,
